@@ -62,6 +62,7 @@ const FlightPlanMap = props => {
 	const [icons, setIcons] = useState({})
 	const tileRef = useRef(null)
 
+
 	useEffect(() => {
 
 		httpget("/uav/commands/export", response => {
@@ -116,6 +117,7 @@ const FlightPlanMap = props => {
 			time: new MarkerIcon({ iconUrl: "../assets/icon-time.png" }),
 			path: new MarkerIcon({ iconUrl: "../assets/icon-path.png" }),
 			jump: new MarkerIcon({ iconUrl: "../assets/icon-jump.png" }),
+			drop: new MarkerIcon({ iconUrl: "../assets/icon-drop.png"}),
 			uav: new VehicleIcon({ iconUrl: "../assets/uav.svg" }),
 			uavDirection: new DirectionPointerIcon({ iconUrl: "../assets/pointer.svg" }),
 			uavDirectionOutline: new DirectionPointerIcon({ iconUrl: "../assets/pointer-outline.svg" }),
@@ -170,7 +172,7 @@ const FlightPlanMap = props => {
 		let get = props.getters["path"]
 		let set = props.setters["path"]
 		let temp = get.slice()
-		if (datatype == "unlim" || datatype == "time" || datatype == "turn") {
+		if (datatype == "unlim" || datatype == "time" || datatype == "turn" || datatype == "drop") {
 			datatype = "path"
 		}
 		let loc = { ...props.getters[datatype][idx], lat: event.target.getLatLng().lat, lng: event.target.getLatLng().lng, opacity: 0.5 }
@@ -259,7 +261,7 @@ const FlightPlanMap = props => {
 		if (props.getters.placementMode === "disabled") {
 			return
 		} else if (["push", "insert"].includes(props.getters.placementMode)) {
-			if (datatype === "unlim" || datatype === "turn" || datatype === "time" || datatype === "path") {
+			if (datatype === "unlim" || datatype === "turn" || datatype === "time" || datatype === "path" || datatype === "drop") {
 				if (props.getters.firstJump === -1) {
 					props.setters.firstJump(key)
 				} else {
@@ -365,7 +367,16 @@ const FlightPlanMap = props => {
 						props.setters.path([...path.slice(0, i), { ...marker, alt: k }, ...path.slice(i + 1)])
 						props.setters.pathSaved(false)
 					})} />
-					{datatype !== "path" && <div>
+					{datatype === "drop" && <div>
+						<br />
+						Bottle Number
+						<Box style={{ "width": "12em", "margin-right": "4em", "height": "3em" }} editable={true} placeholder={"---"} content={marker?.p1} onChange={v => positiveSignedIntValidation(v, marker.p1, (k) => {
+							let path = props.getters.path
+							props.setters.path([...path.slice(0, i), { ...marker, p1: k }, ...path.slice(i + 1)])
+							props.setters.pathSaved(false)
+						})} />
+					</div>}
+					{datatype !== "path" && datatype !== "drop" && <div>
 						{datatype === "turn" && <div>
 							<br />
 							# of Turns
@@ -384,7 +395,6 @@ const FlightPlanMap = props => {
 								props.setters.pathSaved(false)
 							})} />
 						</div>}
-						<br />
 						Radius (feet)
 						<Box style={{ "width": "12em", "margin-right": "4em", "height": "3em" }} editable={true} placeholder={"---"} content={marker?.p3} onChange={v => signedFloatValidation(v, marker.p3, (k) => {
 							let path = props.getters.path
@@ -585,6 +595,13 @@ const FlightPlanMap = props => {
 										<div>
 											<h5>#{i + 1}: Time Loiter</h5>
 											{MarkerPopup({marker: marker, i: i, datatype: "time"})}
+										</div>
+									), true)
+								} else if (marker.cmd === Commands.drop) {
+									return popup(marker, marker.num, "drop", (
+										<div>
+											<h5>#{i + 1}: Drop</h5>
+											{MarkerPopup({marker: marker, i: i, datatype: "drop"})}
 										</div>
 									), true)
 								}

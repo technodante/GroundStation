@@ -22,6 +22,7 @@ const FlightPlanToolbar = props => {
 	const placementTypes = {
 		"waypoint": "Waypoint",
 		"jump": "Jump",
+		"drop": "Drop",
 		"unlimLoiter": "Unlimited Loiter",
 		"turnLoiter": "Turn Loiter",
 		"timeLoiter": "Time Loiter",

@@ -106,6 +106,7 @@ const FlightData = () => {
 		turn: ["Turn Loiter", "Turn Loiter"],
 		time: ["Time Loiter", "Time Loiter"],
 		jump: ["Jump", "Jump"],
+		drop: ["Drop", "Drop"],
 		uav: ["UAV", "UAV Location"],
 		water: ["Drop", "Bottle Drop Location"]
 	}
